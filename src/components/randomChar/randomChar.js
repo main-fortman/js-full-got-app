@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
+import GotService from '../../services/gotService';
+import Spinner from '../spinner/spinner';
+import ErrorMessage from '../errorMessage/errorMessage';
 
 const RandomBlock = styled.div`
     background-color: #fff;
@@ -9,6 +12,9 @@ const RandomBlock = styled.div`
         margin-bottom: 20px;
         text-align: center;
     }
+    img {
+        width: 100%
+    }
 `;
 
 const Term = styled.span`
@@ -17,30 +23,73 @@ const Term = styled.span`
 
 export default class RandomChar extends Component {
 
+    constructor() {
+        super();
+        this.updateCaracter();
+        
+    }
+
+    gotService = new GotService();
+
+    state = {
+        char: {},
+        loading: true,
+         error: false
+    }
+
+    onCharLoaded = char => {
+        this.setState({char, loading: false});
+    }
+
+    onError = error => {
+        this.setState({error: true, loading: false});
+    }
+
+    updateCaracter() {
+        const id = Math.floor(Math.random() * 140 + 25); // 25-140
+        this.gotService.getCharacter(id)
+            .then(this.onCharLoaded)
+            .catch(this.onError);
+    }
+
     render() {
+        const {char, loading, error} = this.state;
 
         return (
             <RandomBlock className="rounded">
-                <h4>Random Character: John</h4>
-                <ul className="list-group list-group-flush">
-                    <li className="list-group-item d-flex justify-content-between">
-                        <Term>Gender </Term>
-                        <span>male</span>
-                    </li>
-                    <li className="list-group-item d-flex justify-content-between">
-                        <Term>Born </Term>
-                        <span>11.03.1039</span>
-                    </li>
-                    <li className="list-group-item d-flex justify-content-between">
-                        <Term>Died </Term>
-                        <span>13.09.1089</span>
-                    </li>
-                    <li className="list-group-item d-flex justify-content-between">
-                        <Term>Culture </Term>
-                        <span>Anarchy</span>
-                    </li>
-                </ul>
+                {loading ? 
+                    <Spinner/> : 
+                    error ? 
+                        <ErrorMessage/> : 
+                        <View char={char}/>
+                }
             </RandomBlock>
         );
     }
+}
+
+const View = ({char:{name, gender, born, died, culture}}) => {
+    return (
+        <>
+            <h4>Random Character: {name}</h4>
+            <ul className="list-group list-group-flush">
+                <li className="list-group-item d-flex justify-content-between">
+                    <Term>Gender </Term>
+                    <span>{gender}</span>
+                </li>
+                <li className="list-group-item d-flex justify-content-between">
+                    <Term>Born </Term>
+                    <span>{born}</span>
+                </li>
+                <li className="list-group-item d-flex justify-content-between">
+                    <Term>Died </Term>
+                    <span>{died}</span>
+                </li>
+                <li className="list-group-item d-flex justify-content-between">
+                    <Term>Culture </Term>
+                    <span>{culture}</span>
+                </li>
+            </ul>
+        </>
+    )
 }
