@@ -12,9 +12,6 @@ const RandomBlock = styled.div`
         margin-bottom: 20px;
         text-align: center;
     }
-    img {
-        width: 100%
-    }
 `;
 
 const Term = styled.span`
@@ -22,12 +19,6 @@ const Term = styled.span`
 `;
 
 export default class RandomChar extends Component {
-
-    constructor() {
-        super();
-        this.updateCaracter();
-        
-    }
 
     gotService = new GotService();
 
@@ -45,11 +36,21 @@ export default class RandomChar extends Component {
         this.setState({error: true, loading: false});
     }
 
-    updateCaracter() {
+    updateCaracter = () => {
+        console.log('update');
         const id = Math.floor(Math.random() * 140 + 25); // 25-140
         this.gotService.getCharacter(id)
             .then(this.onCharLoaded)
             .catch(this.onError);
+    }
+
+    componentDidMount() {
+        this.updateCaracter();
+        this.timerId = setInterval(this.updateCaracter, 1500);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerId);
     }
 
     render() {
