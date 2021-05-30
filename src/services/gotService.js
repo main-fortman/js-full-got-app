@@ -46,7 +46,6 @@ export default class GotService {
     
     _extractId = (item) => {
         const idRegExp = /\/([0-9]*)$/;
-        console.log(item);
         return item.url.match(idRegExp)[1];
     }
 
