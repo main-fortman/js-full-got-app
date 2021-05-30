@@ -11,6 +11,7 @@ const RandomBlock = styled.div`
     h4 {
         margin-bottom: 20px;
         text-align: center;
+        overflow-wrap: break-word;
     }
 `;
 
@@ -46,7 +47,7 @@ export default class RandomChar extends Component {
 
     componentDidMount() {
         this.updateCaracter();
-        this.timerId = setInterval(this.updateCaracter, 1500);
+        this.timerId = setInterval(this.updateCaracter, 150000);
     }
 
     componentWillUnmount() {

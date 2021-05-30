@@ -7,7 +7,7 @@ import ErrorMessage from '../errorMessage/errorMessage';
 export default class ItemList extends Component {
 
     state = {
-        charList: null,
+        items: null,
         error: false
     }
 
@@ -18,8 +18,11 @@ export default class ItemList extends Component {
     }
 
     componentDidMount() {
-        this.gotService.getAllCharacters()
-            .then(charList => this.setState({charList}))
+
+        const {getData} = this.props;
+
+        getData()
+            .then(items => this.setState({items}))
             .catch(e => this.setState({error: true}));
     }
 
@@ -30,27 +33,27 @@ export default class ItemList extends Component {
                 <li 
                     key={item.id}
                      className="list-group-item"
-                     onClick={() => this.props.onCharSelected(item.id)}
+                     onClick={() => this.props.onItemSelected(item.id)}
                 >
-                    {item.name}
+                    {this.props.renderItem(item)}
                 </li>
             )
         })
     }
 
     render() {
-        const {charList, error} = this.state;
+        const {items, error} = this.state;
 
         if (error) {
             return <ErrorMessage/>;
         }
 
-        if (!charList) {
+        if (!items) {
             return <Spinner/>
         }
         return (
             <ul className="item-list list-group">
-                {this.renderItems(charList)}
+                {this.renderItems(items)}
             </ul>
         );
     }
