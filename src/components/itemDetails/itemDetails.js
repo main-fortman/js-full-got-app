@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import './itemDetails.css';
 import styled from 'styled-components';
 import GotService from '../../services/gotService';
@@ -26,74 +26,60 @@ const Field = ({item, field, label}) => {
 
 export {Field};
 
-export default class ItemDetails extends Component {
+export default function ItemDetails({itemId, getData, children}) {
 
-    state = {
-        item: null,
-        loading: true,
-        error: false
-    }
+    const [item, setItem] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
-    componentDidMount() {
-        this.updateItem();
-    }
+    useEffect(() => {
+        updateItem();
+    }, [itemId]);
 
-    componentDidUpdate(prevProps) {
-        if (this.props.itemId !== prevProps.itemId) {
-            this.updateItem();
-        }
-    }
-
-    gotService = new GotService();
-
-    updateItem() {
-        const {itemId, getData} = this.props;
+    function updateItem() {
         if (!itemId) {
             return;
         }
 
-        this.setState({loading: true});
+        setLoading(true);
 
         getData(itemId)
-            .then(item => this.setState({item, loading: false, error: false}))
+            .then(item => {
+                setItem(item);
+                setLoading(false);
+                setError(false);
+            })
             .catch(e => {
                 console.log(e);
-                this.setState({error: true, loading: false});
+                setLoading(false);
+                setError(true);
             });
 
         // this.foo.bar.type = 0;
     }
 
-    render() {
-
-        const {item, loading, error} = this.state;
-
-        if (error) {
-            return <ErrorMessage/>;
-        }
-
-        if (!item) {
-            return <span className='select-error'>Please select a item</span>;
-        }
-
-        if (loading) {
-            return <Spinner/>;
-        }
-
-
-        const {name} = item;
-
-        return (
-            <ItemDetailsDiv className="rounded">
-                <h4>{name}</h4>
-                <ul className="list-group list-group-flush">
-                    {
-                        React.Children.map(this.props.children, child => {
-                            return React.cloneElement(child, {item})
-                        })
-                    }
-                </ul>
-            </ItemDetailsDiv>
-        );
+    if (error) {
+        return <ErrorMessage/>;
     }
+
+    if (!item) {
+        return <span className='select-error'>Please select a item</span>;
+    }
+
+    if (loading) {
+        return <Spinner/>;
+    }
+
+    return (
+        <ItemDetailsDiv className="rounded">
+            <h4>{item.name}</h4>
+            <ul className="list-group list-group-flush">
+                {
+                    React.Children.map(children, child => {
+                        return React.cloneElement(child, {item})
+                    })
+                }
+            </ul>
+        </ItemDetailsDiv>
+    );
 }

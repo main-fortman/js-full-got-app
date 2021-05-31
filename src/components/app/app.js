@@ -54,6 +54,9 @@ export default class App extends React.Component {
                             </Col>
                         </Row>
                         <Switch>
+                            <Route path='/' exact>
+                                
+                            </Route>
                             <Route path='/characters'>
                                 <CharacterPage/>
                             </Route>
